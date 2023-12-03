@@ -1470,4 +1470,353 @@ public class IntroductoryTest {
         answer = n;
         assertThat(answer).isEqualTo(25);
     }
+
+    /**
+     * 정수 n을 기준으로 n과 가까운 수부터 정렬하려고 합니다. 이때 n으로부터의 거리가 같다면 더 큰 수를 앞에 오도록 배치합니다.
+     * 정수가 담긴 배열 numlist와 정수 n이 주어질 때 numlist의 원소를 n으로부터 가까운 순서대로 정렬한 배열을 return하도록 solution 함수를 완성해주세요.
+     * [1, 2, 3, 4, 5, 6]	            4	[4, 5, 3, 6, 2, 1]
+     * [10000,20,36,47,40,6,10,7000]	30	[36, 40, 20, 47, 10, 6, 7000, 10000]
+     */
+    @Test
+    public void 특이한_정렬() {
+        int[] numlist = {1, 2, 3, 4, 5, 6};
+        int n = 4;
+        int[] answer = {};
+
+        Arrays.sort(numlist);
+
+        for (int i=0; i<numlist.length; i++) {
+            for (int j=0; j<numlist.length; j++) {
+                if (Math.abs(n - numlist[i]) <= Math.abs(n - numlist[j])) {
+                    int temp = numlist[i];
+                    numlist[i] = numlist[j];
+                    numlist[j] = temp;
+                }
+            }
+        }
+
+        answer = numlist;
+
+        assertThat(answer).containsExactly(4, 5, 3, 6, 2, 1);
+    }
+
+    /**
+     * 한 개 이상의 항의 합으로 이루어진 식을 다항식이라고 합니다. 다항식을 계산할 때는 동류항끼리 계산해 정리합니다.
+     * 덧셈으로 이루어진 다항식 polynomial이 매개변수로 주어질 때, 동류항끼리 더한 결괏값을 문자열로 return 하도록 solution 함수를 완성해보세요.
+     * 같은 식이라면 가장 짧은 수식을 return 합니다.
+     * "3x + 7 + x"	"4x + 7"
+     * "x + x + x"	"3x"
+     */
+    @Test
+    public void 다항식_더하기() {
+        String polynomial = "x + x + x";
+        String answer = "";
+
+        String[] array = polynomial.split(" \\+ ");
+        int sumX = 0;
+        int sumConstant = 0;
+
+        for (String str : array) {
+            if (str.contains("x")) {
+                if ("x".equals(str)) {
+                    sumX += 1;
+                } else if ("-x".equals(str)) {
+                    sumX -= 1;
+                }else {
+                    sumX += Integer.parseInt(str.substring(0, str.indexOf("x")));
+                }
+            } else {
+                sumConstant += Integer.parseInt(str);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (sumX != 0) {
+            if (sumX != 1) {
+                sb.append(sumX);
+            }
+            sb.append("x");
+        }
+
+        if (sumConstant != 0) {
+            if (sb.length() > 0) {
+                sb.append(" + ");
+            }
+            sb.append(sumConstant);
+        }
+
+        answer = sb.toString();
+
+        assertThat(answer).isEqualTo("3x");
+    }
+
+    /**
+     * 최빈값은 주어진 값 중에서 가장 자주 나오는 값을 의미합니다. 정수 배열 array가 매개변수로 주어질 때,
+     * 최빈값을 return 하도록 solution 함수를 완성해보세요. 최빈값이 여러 개면 -1을 return 합니다.
+     * [1, 2, 3, 3, 3, 4]	3
+     * [1, 1, 2, 2]	        -1
+     * [1]	                1
+     */
+    @Test
+    public void 최빈값_구하기() {
+        int[] array = {1, 2, 3, 3, 3, 4};
+        int answer = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for (int num : array) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
+        }
+
+        int maxFrequency = 0;
+        // 빈도가 가장 높은 숫자의 빈도수를 찾는다
+        for (int frequency : map.values()) {
+            maxFrequency = Math.max(maxFrequency, frequency);
+        }
+
+        int mode = 0;
+        int count = 0;
+
+        // 빈도가 가장 높은 숫자가 여러 개인지 확인하고, 그렇다면 -1을 반환한다
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            if (entry.getValue() == maxFrequency) {
+                mode = entry.getKey();
+                count++;
+            }
+        }
+
+        answer = count > 1 ? -1 : mode;
+        assertThat(answer).isEqualTo(3);
+    }
+
+    /**
+     * 덧셈, 뺄셈 수식들이 'X [연산자] Y = Z' 형태로 들어있는 문자열 배열 quiz가 매개변수로 주어집니다.
+     * 수식이 옳다면 "O"를 틀리다면 "X"를 순서대로 담은 배열을 return하도록 solution 함수를 완성해주세요.
+     * ["3 - 4 = -3", "5 + 6 = 11"]	                                ["X", "O"]
+     * ["19 - 6 = 13", "5 + 66 = 71", "5 - 15 = 63", "3 - 1 = 2"]	["O", "O", "X", "O"]
+     */
+    @Test
+    public void OX퀴즈() {
+        String[] quiz = {"19 - 6 = 13", "5 + 66 = 71", "5 - 15 = 63", "3 - 1 = 2"};
+        String[] answer = new String[quiz.length];
+
+        for (int i=0; i<quiz.length; i++) {
+            boolean solution = false;
+            String[] str = quiz[i].split(" ");
+
+            int X = Integer.parseInt(str[0]);
+            int Y = Integer.parseInt(str[2]);
+            int Z = Integer.parseInt(str[4]);
+            String operator = str[1];
+
+            if (operator.equals("+") && X + Y == Z) {
+                solution = true;
+            } else if (operator.equals("-") && X - Y == Z) {
+                solution = true;
+            }
+
+            answer[i] = solution ? "O" : "X";
+        }
+
+        assertThat(answer).containsExactly("O", "O", "X", "O");
+    }
+
+    /**
+     * 등차수열 혹은 등비수열 common이 매개변수로 주어질 때, 마지막 원소 다음으로 올 숫자를 return 하도록 solution 함수를 완성해보세요.
+     * [1, 2, 3, 4]	5
+     * [2, 4, 8]	16
+     */
+    @Test
+    public void 다음에_올_숫자() {
+        int[] common = {1, 2, 3, 4};
+        int answer = 0;
+        int n = common.length - 1;
+
+        answer = common[n] - common[n-1] == common[n-1] - common[n-2]
+                ? common[n] + (common[n] - common[n-1])
+                : common[n] * (common[n] / common[n-1]);
+
+        assertThat(answer).isEqualTo(16);
+    }
+
+    /**
+     * 연속된 세 개의 정수를 더해 12가 되는 경우는 3, 4, 5입니다. 두 정수 num과 total이 주어집니다.
+     * 연속된 수 num개를 더한 값이 total이 될 때, 정수 배열을 오름차순으로 담아 return하도록 solution함수를 완성해보세요.
+     * 3	12	[3, 4, 5]
+     * 5	15	[1, 2, 3, 4, 5]
+     * 4	14	[2, 3, 4, 5]
+     * 5	5	[-1, 0, 1, 2, 3]
+     */
+    @Test
+    public void 연속된_수의_합() {
+        int num = 4;
+        int total = 14;
+        int[] answer = new int[num];
+        int middleValue = total / num;
+        int middleIndex = num % 2 == 0 ? num / 2 - 1 : num / 2;
+
+        answer[middleIndex] = middleValue;
+        for (int i=middleIndex-1; i>=0; i--) {
+            answer[i] = answer[i+1] - 1;
+        }
+
+        for (int i=middleIndex+1; i<num; i++) {
+            answer[i] += answer[i-1] + 1;
+        }
+
+        assertThat(answer).containsExactly(2, 3, 4, 5);
+    }
+
+    /**
+     * 첫 번째 분수의 분자와 분모를 뜻하는 numer1, denom1, 두 번째 분수의 분자와 분모를 뜻하는 numer2, denom2가 매개변수로 주어집니다.
+     * 두 분수를 더한 값을 기약 분수로 나타냈을 때 분자와 분모를 순서대로 담은 배열을 return 하도록 solution 함수를 완성해보세요.
+     * 1	2	3	4	[5, 4]
+     * 9	2	1	3	[29, 6]
+     */
+    @Test
+    public void 분수의_덧셈() {
+        int numer1 = 9;
+        int denom1 = 2;
+        int numer2 = 1;
+        int denom2 = 3;
+        int[] answer = new int[2];
+
+        int sumNumer = numer1 * denom2 + numer2 * denom1;
+        int sumDenom = denom1 * denom2;
+        int max = 1;
+
+        for (int i=1; i<=sumNumer && i<=sumDenom; i++) {
+            if (sumNumer % i == 0 && sumDenom % i == 0) {
+                max = i;
+            }
+        }
+
+        answer[0] = sumNumer / max;
+        answer[1] = sumDenom / max;
+
+        assertThat(answer).containsExactly(29, 6);
+    }
+
+    /**
+     * 지뢰가 있는 지역과 지뢰에 인접한 위, 아래, 좌, 우 대각선 칸을 모두 위험지역으로 분류합니다.
+     * 지뢰는 2차원 배열 board에 1로 표시되어 있고 board에는 지뢰가 매설 된 지역 1과, 지뢰가 없는 지역 0만 존재합니다.
+     * 지뢰가 매설된 지역의 지도 board가 매개변수로 주어질 때, 안전한 지역의 칸 수를 return하도록 solution 함수를 완성해주세요.
+     * [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0]]	16
+     * [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 0]]	13
+     * [[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]]	0
+     */
+    @Test
+    public void 안전지대() {
+        int[][] board = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 1, 0}, {0, 0, 0, 0, 0}};
+        int answer = 0;
+
+        for (int i=0; i<board.length; i++) {
+            for (int j=0; j<board[i].length; j++) {
+                if (board[i][j] == 1) {
+                    for (int a=(i-1); a<=(i+1); a++) {
+                        for (int b=(j-1); b<=(j+1); b++) {
+                            if (a > -1 && a < board.length && b > -1 && b <board[a].length && board[a][b] != 1) {
+                                board[a][b] = 2;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int[] ints : board) {
+            for (int anInt : ints) {
+                if (anInt == 0) {
+                    answer++;
+                }
+            }
+        }
+
+        // 배열 출력
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        assertThat(answer).isEqualTo(13);
+    }
+
+    /**
+     * 선분 3개가 평행하게 놓여 있습니다. 세 선분의 시작과 끝 좌표가 [[start, end], [start, end], [start, end]]
+     * 형태로 들어있는 2차원 배열 lines가 매개변수로 주어질 때, 두 개 이상의 선분이 겹치는 부분의 길이를 return 하도록 solution 함수를 완성해보세요.
+     * [[0, 1],  [2, 5],  [3, 9]]	2
+     * [[-1, 1], [1, 3],  [3, 9]]	0
+     * [[0, 5],  [3, 9],  [1, 10]]	8
+     */
+    @Test
+    public void 겹치는_선분의_길이() {
+        int[][] lines = new int[][]{{0, 1}, {2, 5}, {3, 9}};
+        int answer = 0;
+
+        int[] rail = new int[200];
+        for (int[] line : lines) {
+            for (int j = (line[0] + 100); j < (line[1] + 100); j++) {
+                rail[j]++;
+            }
+        }
+
+        for (int value : rail) {
+            if (value > 1) answer++;
+        }
+
+        assertThat(answer).isEqualTo(2);
+    }
+
+    /**
+     * 점 네 개의 좌표를 담은 이차원 배열  dots가 다음과 같이 매개변수로 주어집니다.
+     * [[x1, y1], [x2, y2], [x3, y3], [x4, y4]]
+     * 주어진 네 개의 점을 두 개씩 이었을 때, 두 직선이 평행이 되는 경우가 있으면 1을 없으면 0을 return 하도록 solution 함수를 완성해보세요.
+     * 두 직선이 겹치는 경우(일치하는 경우)에도 1을 return 해주세요.
+     * [[1, 4], [9, 2], [3, 8], [11, 6]]	1
+     * [[3, 5], [4, 1], [2, 4], [5, 10]]	0
+     */
+    @Test
+    public void 평행() {
+        int[][] dots = {{1, 4}, {9, 2}, {3, 8}, {11, 6}};
+        int answer = 0;
+
+        int xDiff1 = dots[1][0] - dots[0][0];
+        int yDiff1 = dots[1][1] - dots[0][1];
+        int xDiff2 = dots[3][0] - dots[2][0];
+        int yDiff2 = dots[3][1] - dots[2][1];
+
+        if (Math.abs(xDiff1 * yDiff2) == Math.abs(xDiff2 * yDiff1)) {
+            answer = 1;
+        } else {
+            answer = 0;
+        }
+
+        assertThat(answer).isEqualTo(1);
+    }
+
+    /**
+     * 조카는 아직 "aya", "ye", "woo", "ma" 네 가지 발음을 최대 한 번씩 사용해 조합한(이어 붙인) 발음밖에 하지 못합니다.
+     * 문자열 배열 babbling이 매개변수로 주어질 때, 머쓱이의 조카가 발음할 수 있는 단어의 개수를 return하도록 solution 함수를 완성해주세요.
+     * ["aya", "yee", "u", "maa", "wyeoo"]	1
+     * ["ayaye", "uuuma", "ye", "yemawoo", "ayaa"]	3
+     */
+    @Test
+    public void 옹알이_1() {
+        String[] babbling = {"ayaye", "uuuma", "ye", "yemawoo", "ayaa"};
+        int answer = 0;
+
+        for (int i =0; i < babbling.length; i++) {
+            babbling[i] = babbling[i].replace("aya", "1");
+            babbling[i] = babbling[i].replace("woo", "1");
+            babbling[i] = babbling[i].replace("ye", "1");
+            babbling[i] = babbling[i].replace("ma", "1");
+            babbling[i] = babbling[i].replace("1", "");
+            if(babbling[i].isEmpty()) {
+                answer += 1;
+            }
+        }
+
+        assertThat(answer).isEqualTo(3);
+    }
 }
