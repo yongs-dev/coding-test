@@ -1,0 +1,39 @@
+    class Solution {
+        public boolean isPalindrome(String s) {
+            if (s == null || s.isEmpty()) return true;
+            s = s.toLowerCase().replaceAll("[^a-z0-9]", "");
+
+            int left = 0, right = s.length() - 1;
+
+            while (left < right) {
+                if (s.charAt(left) == s.charAt(right)) {
+                    left++;
+                    right--;
+                } else {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public boolean isPalindrome2(String s) {
+            // 1. 문자열을 소문자로 변환하고 알파벳과 숫자 이외의 문자를 제거합니다.
+            StringBuilder cleanedString = new StringBuilder();
+            for (char c : s.toCharArray()) {
+                if (Character.isLetterOrDigit(c)) {
+                    cleanedString.append(Character.toLowerCase(c));
+                }
+            }
+
+            // 2. 정방향과 역방향 문자열을 비교합니다.
+            String cleaned = cleanedString.toString();
+            String reversed = cleanedString.reverse().toString();
+
+            return cleaned.equals(reversed);
+        }
+
+    }
+
+//runtime:13 ms
+//memory:45.2 MB
