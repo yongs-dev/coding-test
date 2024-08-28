@@ -42,25 +42,27 @@ public class ConvertANumberToHexadecimal_405 {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public String toHex(int num) {
-            // 제로 처리
-            if (num == 0) return "0";
-
-            // 음수의 경우, 32비트 두의 보수 방식으로 변환
-            if (num < 0) {
-                num += (1L << 32); // 2^32
-            }
-
-            // 16진수 문자 배열
+            // 16진수로 변환할 때 사용할 문자들
             char[] hexChars = "0123456789abcdef".toCharArray();
-            StringBuilder sb = new StringBuilder();
 
-            while (num > 0) {
-                sb.append(hexChars[num & 0xF]); // 마지막 4비트를 추출하여 16진수 문자로 변환
-                num >>>= 4; // 4비트 오른쪽 시프트
+            // 예외 처리: 숫자가 0인 경우, 결과는 "0"
+            if (num == 0) {
+                return "0";
             }
 
-            // 문자열을 역순으로 변환
-            return sb.reverse().toString();
+            // 결과를 담을 StringBuilder
+            StringBuilder hexString = new StringBuilder();
+
+            // 32비트 정수의 모든 비트를 처리
+            while (num != 0) {
+                // 마지막 4비트를 얻기 위해 num & 0xF를 사용
+                hexString.append(hexChars[num & 0xF]);
+                // 오른쪽으로 4비트 시프트하여 다음 4비트를 준비
+                num >>>= 4; // 부호 없는 시프트 연산자
+            }
+
+            // 16진수 문자열이 거꾸로 생성되었으므로, 뒤집기
+            return hexString.reverse().toString();
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
