@@ -3,7 +3,6 @@ package com.mark.codingtest.baekjoon;
 import java.util.Scanner;
 
 /**
- * <b>버블 정렬(Bubble Sort). O(N^2)</b><br>
  * <pre>
  * 문제
  * N개의 수가 주어졌을 때, 이를 오름차순으로 정렬하는 프로그램을 작성하시오.
@@ -30,6 +29,9 @@ import java.util.Scanner;
  */
 public class B2750_수정렬하기1 {
 
+    /**
+     * <b>버블 정렬(Bubble Sort). O(N^2)</b><br>
+     */
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int N = sc.nextInt();
@@ -46,6 +48,36 @@ public class B2750_수정렬하기1 {
                     A[j + 1] = swap;
                 }
             }
+        }
+
+        for (int i : A) {
+            System.out.println(i);
+        }
+    }
+
+    /**
+     * <b>선택 정렬(Selection Sort). O(N^2)</b><br>
+     */
+    private static void selectionSort() {
+        Scanner sc = new Scanner(System.in);
+        int N = sc.nextInt();
+        int[] A = new int[N];
+        for (int i = 0; i < N; i++) {
+            A[i] = sc.nextInt();
+        }
+
+        for (int i = 0; i < N; i++) {
+            int minIndex = i;
+
+            for (int j = i + 1; j < N; j++) {
+                if (A[j] < A[minIndex]) {
+                    minIndex = j;
+                }
+            }
+
+            int swap = A[i];
+            A[i] = A[minIndex];
+            A[minIndex] = swap;
         }
 
         for (int i : A) {
