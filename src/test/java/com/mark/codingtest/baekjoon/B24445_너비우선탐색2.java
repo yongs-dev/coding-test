@@ -49,9 +49,10 @@ import java.util.*;
  * 4
  * 2
  * 0
+ * 정점 1번에서 정점 4번, 정점 2번을 순서대로 방문한다. 정점 4번에서 정점 3번을 방문한다. 정점 5번은 정점 1번에서 방문할 수 없다.
  * </pre>
  */
-public class B24444_너비우선탐색2 {
+public class B24445_너비우선탐색2 {
 
     static List<Integer>[] graph;
     static boolean[] visited;
